@@ -90,16 +90,31 @@ function canWrite(word: Word, cards: Record<string, Card>) {
   return word.requires.every((letterId) => cards[letterId] && isMastered(cards[letterId]))
 }
 
-/** Leurres d'un exercice de reconnaissance : d'autres sens de mots, choisis de façon
- *  déterministe. */
+/** Leurres d'un exercice sur un mot : d'abord les mots du même thème, complétés si besoin
+ *  par les autres. Confondre « la porte » et « la fenêtre » a du sens ; « la porte » et
+ *  « jaune », non — un QCM entre thèmes se devine par élimination. */
 function wordDistractors(target: Word, pick: (word: Word) => string) {
+  const sameTheme = shuffle(
+    words.filter((w) => w.theme === target.theme && w.id !== target.id),
+    target.id,
+  )
+  const others = shuffle(
+    words.filter((w) => w.theme !== target.theme && w.id !== target.id),
+    target.id,
+  )
   const chosen: string[] = []
-  for (const word of shuffle(words.filter((w) => w.id !== target.id), target.id)) {
+  for (const word of [...sameTheme, ...others]) {
     const value = pick(word)
     if (value !== pick(target) && !chosen.includes(value)) chosen.push(value)
     if (chosen.length === 3) break
   }
   return chosen
+}
+
+/** Correction affichée pour un mot : translittération, sens, épellation, et la remarque
+ *  éventuelle. L'épellation est générée depuis la graphie, elle ne peut pas diverger. */
+function wordNote(word: Word) {
+  return `${word.translit} — ${word.meaning}. ${word.spell}.${word.note ? ` ${word.note}` : ''}`
 }
 
 function wordIntroItem(word: Word): Item {
@@ -110,7 +125,7 @@ function wordIntroItem(word: Word): Item {
     arabic: word.arabic,
     translit: word.translit,
     meaning: word.meaning,
-    note: word.note,
+    note: `${word.spell}.${word.note ? ` ${word.note}` : ''}`,
   }
 }
 
@@ -122,7 +137,7 @@ function translateItem(word: Word): Item {
     arabic: word.arabic,
     answer: word.meaning,
     options: [word.meaning, ...wordDistractors(word, (w) => w.meaning)],
-    note: `${word.translit} — ${word.meaning}${word.note ? `. ${word.note}` : ''}`,
+    note: wordNote(word),
   }
 }
 
@@ -133,7 +148,7 @@ function wordListenItem(word: Word): Item {
     label: 'Écoute et choisis le mot',
     arabic: word.arabic,
     options: [word.arabic, ...wordDistractors(word, (w) => w.arabic)],
-    note: `${word.translit} — ${word.meaning}`,
+    note: wordNote(word),
   }
 }
 
@@ -144,7 +159,7 @@ function writeItem(word: Word): Item {
     label: 'Écris en arabe',
     prompt: `${word.translit} — ${word.meaning}`,
     answer: word.arabic,
-    note: word.note,
+    note: wordNote(word),
   }
 }
 

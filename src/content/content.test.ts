@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { letters, lettersById, orderedLetters, teachingOrder } from './letters'
-import { lettersOf, words } from './words'
+import { lettersOf, spellOut, themeOrder, words } from './words'
 import { placementLetters, seedFromPlacement } from './placement'
 
 describe('alphabet', () => {
@@ -55,14 +55,18 @@ describe('vocabulaire', () => {
     }
   })
 
-  it('ne laisse aucun caractère arabe non reconnu', () => {
-    const known = new Set(letters.map((l) => l.char))
-    const variants = new Set([...'أإآةى'])
+  it('sait nommer chaque caractère de chaque mot', () => {
+    // L'épellation est la preuve qu'aucune graphie n'est ignorée : une hamza isolée ou un
+    // tā fermé oublié produirait moins de parties que le mot n'a de caractères.
     for (const word of words) {
-      for (const char of word.arabic) {
-        expect(known.has(char) || variants.has(char)).toBe(true)
-      }
+      expect(spellOut(word.arabic).split(' + ')).toHaveLength([...word.arabic].length)
     }
+  })
+
+  it('génère l’épellation dans l’ordre de lecture', () => {
+    expect(spellOut('كتاب')).toBe('kāf + tā + alif + bā')
+    expect(spellOut('مدرسة')).toBe('mīm + dāl + rā + sīn + tā fermé')
+    expect(spellOut('ماء')).toBe('mīm + alif + hamza')
   })
 
   it('rattache les graphies dérivées à leur lettre de base', () => {
@@ -80,6 +84,36 @@ describe('vocabulaire', () => {
   it('n’a pas deux mots de même sens, sinon un QCM serait insoluble', () => {
     const meanings = words.map((word) => word.meaning)
     expect(new Set(meanings).size).toBe(meanings.length)
+  })
+
+  it('n’a ni identifiant ni graphie en double', () => {
+    for (const key of ['id', 'arabic'] as const) {
+      const values = words.map((word) => word[key])
+      expect(new Set(values).size).toBe(values.length)
+    }
+  })
+})
+
+describe('thèmes', () => {
+  it('rattache chaque mot à un thème déclaré', () => {
+    const known = new Set(themeOrder.map((theme) => theme.id))
+    for (const word of words) expect(known.has(word.theme)).toBe(true)
+  })
+
+  it('ne laisse aucun thème vide, sinon ses leurres seraient introuvables', () => {
+    for (const theme of themeOrder) {
+      const count = words.filter((word) => word.theme === theme.id).length
+      // il faut la bonne réponse plus trois leurres du même thème
+      expect(count).toBeGreaterThanOrEqual(4)
+    }
+  })
+
+  it('groupe les mots par thème dans l’ordre d’introduction', () => {
+    const seen: string[] = []
+    for (const word of words) {
+      if (seen[seen.length - 1] !== word.theme) seen.push(word.theme)
+    }
+    expect(seen).toEqual(themeOrder.map((theme) => theme.id))
   })
 })
 

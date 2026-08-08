@@ -163,6 +163,25 @@ Les mots ne font pas la queue derrière les 28 lettres : dès qu'un mot est déb
 une part réservée du quota de nouveautés (`WORDS_PER_SESSION`). Sans cette réserve, le premier
 mot n'arrivait qu'au 11ᵉ jour ; avec, il arrive au 3ᵉ.
 
+## Vocabulaire thématique
+
+**78 mots en 10 thèmes** ([content/words.ts](src/content/words.ts)) : famille, maison,
+nourriture, nature, corps, objets, ville, couleurs, temps, mots utiles.
+
+Le thème n'est pas décoratif, il sert les leurres. Un QCM entre thèmes se devine par
+élimination — « la porte » face à « jaune » n'est pas une question. Les leurres sont donc
+tirés **dans le thème du mot** : « la mère » face à « le père », « le mari », « le grand-père ».
+Un thème compte au moins 4 mots, sinon ses leurres seraient introuvables — c'est vérifié par
+un test.
+
+Deux champs sont **générés depuis la graphie** plutôt que saisis : la décomposition en lettres
+(`requires`, qui pilote les verrous) et l'épellation affichée en correction (`spell`, « kāf +
+tā + alif + bā »). Une liste recopiée à la main finit toujours par diverger du mot ; un test
+vérifie que chaque caractère de chaque mot sait être nommé, hamza isolée et tā fermé compris.
+
+Autonomie mesurée à 10 min/jour : **78 mots atteints vers le 90ᵉ jour**, contre 22 mots au
+30ᵉ auparavant.
+
 ## Plafond d'écriture
 
 Réviser un mot veut toujours dire l'écrire, et écrire est la modalité la plus exigeante : il
@@ -192,12 +211,14 @@ renvoie la date UTC, ce qui décalait les échéances d'un jour à l'est de Gree
 - ✅ 22 mots, chacun verrouillé tant que ses lettres ne sont pas maîtrisées
 - ✅ Réglages : rythme, niveau, effacement
 - ✅ Migration du schéma 1 vers le 2 sans perte de progression
-- ✅ 48 tests sur la logique pure : répétition espacée, dates, séance, contenu, placement
+- ✅ 53 tests sur la logique pure : répétition espacée, dates, séance, contenu, placement
 - ✅ Trois modalités sur les mots — sens, écoute, écriture — servies selon la maîtrise
+- ✅ 78 mots en 10 thèmes, avec des leurres tirés dans le thème
 - ⚠️ L'audio dépend des voix du système. Un exercice d'écoute sur un appareil sans voix arabe
   reste jouable mais muet : il faudra des enregistrements réels (voir *Audio* ci-dessous)
-- ❌ Vocabulaire limité à 22 mots, sans thèmes : l'app est à court de contenu vers le 30ᵉ jour
 - ❌ Aucun travail de prononciation : les sons de gorge (ح خ ع غ) ne sont jamais produits
+- ❌ Ni grammaire ni phrases : l'app s'arrête au mot isolé
+- ⚠️ Le vocabulaire n'a pas été relu par un locuteur natif
 - ❌ Pas de grammaire, pas de phrases : l'app s'arrête au mot isolé
 
 L'ancienne version (monolithe de 2 635 lignes) a été supprimée ; elle reste consultable dans
