@@ -20,6 +20,14 @@ export type TeachItem = Base & {
   connects: boolean
 }
 
+/** Présentation d'un mot encore jamais vu. Même rôle que `teach` pour les lettres. */
+export type WordIntroItem = Base & {
+  kind: 'word-intro'
+  arabic: string
+  translit: string
+  meaning: string
+}
+
 /** Voir un signe arabe, choisir sa lecture en latin. */
 export type RecognizeItem = Base & {
   kind: 'recognize'
@@ -28,26 +36,40 @@ export type RecognizeItem = Base & {
   options: string[]
 }
 
-/** Entendre, choisir le signe arabe correspondant. */
+/** Voir un mot arabe, choisir son sens en français. Modalité la plus accessible :
+ *  elle ne demande que de reconnaître, pas de produire. */
+export type TranslateItem = Base & {
+  kind: 'translate'
+  arabic: string
+  answer: string
+  options: string[]
+}
+
+/** Entendre, choisir la graphie correspondante. Sert aux lettres comme aux mots. */
 export type ListenItem = Base & {
   kind: 'listen'
   arabic: string
   options: string[]
 }
 
-/** Lire une translittération, écrire l'arabe. */
+/** Lire une translittération, écrire l'arabe. Modalité la plus exigeante :
+ *  il faut produire les signes, pas les reconnaître. */
 export type WriteItem = Base & {
   kind: 'write'
   prompt: string
   answer: string
-  /** lettres qui composent le mot : il n'est proposé qu'une fois toutes maîtrisées */
-  requires: string[]
 }
 
-export type Item = TeachItem | RecognizeItem | ListenItem | WriteItem
+export type Item =
+  | TeachItem
+  | WordIntroItem
+  | RecognizeItem
+  | TranslateItem
+  | ListenItem
+  | WriteItem
 
 /** Un écran de présentation ne se corrige pas : il n'entre ni dans le score ni dans la
  *  répétition espacée. */
 export function isScored(item: Item) {
-  return item.kind !== 'teach'
+  return item.kind !== 'teach' && item.kind !== 'word-intro'
 }

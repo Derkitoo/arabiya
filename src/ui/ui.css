@@ -273,6 +273,11 @@
   color: var(--text);
 }
 
+/* Un mot entier ne peut pas occuper la même taille qu'un signe isolé. */
+.prompt__ar--word {
+  font-size: var(--ar-lg);
+}
+
 .title {
   font-size: var(--t-xl);
   font-weight: 700;

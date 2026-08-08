@@ -1,5 +1,4 @@
 import { letters } from './letters'
-import type { WriteItem } from './types'
 
 const byChar = new Map(letters.map((letter) => [letter.char, letter.id]))
 
@@ -18,71 +17,107 @@ export function lettersOf(arabic: string): string[] {
   return [...ids]
 }
 
-const RAW: { id: string; prompt: string; answer: string; note: string }[] = [
-  { id: 'bab', prompt: 'bāb — la porte', answer: 'باب', note: 'bā + alif + bā.' },
+export type Word = {
+  id: string
+  arabic: string
+  /** translittération, sert de consigne à l'exercice d'écriture */
+  translit: string
+  /** sens en français, sert de réponse à l'exercice de reconnaissance */
+  meaning: string
+  /** décomposition en lettres, calculée depuis la graphie */
+  requires: string[]
+  note?: string
+}
+
+const RAW: Omit<Word, 'requires'>[] = [
+  { id: 'bab', arabic: 'باب', translit: 'bāb', meaning: 'la porte', note: 'bā + alif + bā.' },
   {
     id: 'bayt',
-    prompt: 'bayt — la maison',
-    answer: 'بيت',
+    arabic: 'بيت',
+    translit: 'bayt',
+    meaning: 'la maison',
     note: 'bā + yā + tā. Le yā prend sa forme médiane ـيـ au milieu du mot.',
   },
-  { id: 'bint', prompt: 'bint — la fille', answer: 'بنت', note: 'bā + nūn + tā.' },
-  { id: 'walad', prompt: 'walad — le garçon', answer: 'ولد', note: 'wāw + lām + dāl.' },
-  { id: 'umm', prompt: 'umm — la mère', answer: 'أم', note: 'alif portant une hamza, puis mīm.' },
-  { id: 'ab', prompt: 'ab — le père', answer: 'أب', note: 'alif portant une hamza, puis bā.' },
-  { id: 'yad', prompt: 'yad — la main', answer: 'يد', note: 'yā + dāl.' },
+  { id: 'bint', arabic: 'بنت', translit: 'bint', meaning: 'la fille', note: 'bā + nūn + tā.' },
+  { id: 'walad', arabic: 'ولد', translit: 'walad', meaning: 'le garçon', note: 'wāw + lām + dāl.' },
+  {
+    id: 'umm',
+    arabic: 'أم',
+    translit: 'umm',
+    meaning: 'la mère',
+    note: 'alif portant une hamza, puis mīm.',
+  },
+  {
+    id: 'ab',
+    arabic: 'أب',
+    translit: 'ab',
+    meaning: 'le père',
+    note: 'alif portant une hamza, puis bā.',
+  },
+  { id: 'yad', arabic: 'يد', translit: 'yad', meaning: 'la main', note: 'yā + dāl.' },
   {
     id: 'ayn',
-    prompt: 'ʿayn — l’œil',
-    answer: 'عين',
+    arabic: 'عين',
+    translit: 'ʿayn',
+    meaning: 'l’œil',
     note: 'ʿayn + yā + nūn. Le mot désigne aussi la source d’eau.',
   },
   {
     id: 'qamar',
-    prompt: 'qamar — la lune',
-    answer: 'قمر',
+    arabic: 'قمر',
+    translit: 'qamar',
+    meaning: 'la lune',
     note: 'qāf + mīm + rā. Le rā ne se lie pas à la suite, le mot s’arrête net.',
   },
-  { id: 'shams', prompt: 'shams — le soleil', answer: 'شمس', note: 'shīn + mīm + sīn.' },
-  { id: 'nar', prompt: 'nār — le feu', answer: 'نار', note: 'nūn + alif + rā.' },
-  { id: 'bahr', prompt: 'baḥr — la mer', answer: 'بحر', note: 'bā + ḥā + rā.' },
-  { id: 'jabal', prompt: 'jabal — la montagne', answer: 'جبل', note: 'jīm + bā + lām.' },
-  { id: 'khubz', prompt: 'khubz — le pain', answer: 'خبز', note: 'khā + bā + zāy.' },
-  { id: 'qalam', prompt: 'qalam — le stylo', answer: 'قلم', note: 'qāf + lām + mīm.' },
-  { id: 'kitab', prompt: 'kitāb — le livre', answer: 'كتاب', note: 'kāf + tā + alif + bā.' },
-  { id: 'salam', prompt: 'salām — la paix', answer: 'سلام', note: 'sīn + lām + alif + mīm.' },
-  { id: 'sadiq', prompt: 'ṣadīq — l’ami', answer: 'صديق', note: 'ṣād + dāl + yā + qāf.' },
-  { id: 'tariq', prompt: 'ṭarīq — la route', answer: 'طريق', note: 'ṭā + rā + yā + qāf.' },
+  { id: 'shams', arabic: 'شمس', translit: 'shams', meaning: 'le soleil', note: 'shīn + mīm + sīn.' },
+  { id: 'nar', arabic: 'نار', translit: 'nār', meaning: 'le feu', note: 'nūn + alif + rā.' },
+  { id: 'bahr', arabic: 'بحر', translit: 'baḥr', meaning: 'la mer', note: 'bā + ḥā + rā.' },
+  { id: 'jabal', arabic: 'جبل', translit: 'jabal', meaning: 'la montagne', note: 'jīm + bā + lām.' },
+  { id: 'khubz', arabic: 'خبز', translit: 'khubz', meaning: 'le pain', note: 'khā + bā + zāy.' },
+  { id: 'qalam', arabic: 'قلم', translit: 'qalam', meaning: 'le stylo', note: 'qāf + lām + mīm.' },
+  {
+    id: 'kitab',
+    arabic: 'كتاب',
+    translit: 'kitāb',
+    meaning: 'le livre',
+    note: 'kāf + tā + alif + bā.',
+  },
+  {
+    id: 'salam',
+    arabic: 'سلام',
+    translit: 'salām',
+    meaning: 'la paix',
+    note: 'sīn + lām + alif + mīm.',
+  },
+  { id: 'sadiq', arabic: 'صديق', translit: 'ṣadīq', meaning: 'l’ami', note: 'ṣād + dāl + yā + qāf.' },
+  { id: 'tariq', arabic: 'طريق', translit: 'ṭarīq', meaning: 'la route', note: 'ṭā + rā + yā + qāf.' },
   {
     id: 'miftah',
-    prompt: 'miftāḥ — la clé',
-    answer: 'مفتاح',
+    arabic: 'مفتاح',
+    translit: 'miftāḥ',
+    meaning: 'la clé',
     note: 'mīm + fā + tā + alif + ḥā.',
   },
   {
     id: 'madrasa',
-    prompt: 'madrasa — l’école',
-    answer: 'مدرسة',
+    arabic: 'مدرسة',
+    translit: 'madrasa',
+    meaning: 'l’école',
     note: 'mīm + dāl + rā + sīn, puis un tā fermé ة à la fin.',
   },
   {
     id: 'ghurfa',
-    prompt: 'ghurfa — la chambre',
-    answer: 'غرفة',
+    arabic: 'غرفة',
+    translit: 'ghurfa',
+    meaning: 'la chambre',
     note: 'ghayn + rā + fā, puis un tā fermé ة.',
   },
 ]
 
-/** Mots courts servant d'exercice d'écriture. Chacun ne sera proposé qu'une fois toutes ses
- *  lettres maîtrisées : on n'écrit pas un mot dont on ne connaît pas les signes. */
-export const words: WriteItem[] = RAW.map((word) => ({
+export const words: Word[] = RAW.map((word) => ({
+  ...word,
   id: `word-${word.id}`,
-  kind: 'write',
-  label: 'Écris en arabe',
-  prompt: word.prompt,
-  answer: word.answer,
-  note: word.note,
-  requires: lettersOf(word.answer),
+  requires: lettersOf(word.arabic),
 }))
 
 export const wordsById = new Map(words.map((word) => [word.id, word]))

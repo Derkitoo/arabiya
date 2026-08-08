@@ -1,7 +1,7 @@
 import { shuffle } from '../lib/shuffle'
 import { isDue, isMastered, type Card } from '../lib/srs'
 import { letters, lettersById, orderedLetters, type Letter } from './letters'
-import { words, wordsById } from './words'
+import { words, wordsById, type Word } from './words'
 import { isScored, type Item } from './types'
 
 /** Ordre d'introduction : les lettres par fréquence d'usage (voir `teachingOrder`), puis les
@@ -78,11 +78,91 @@ function teachItem(letter: Letter): Item {
   }
 }
 
-/** L'exercice se durcit avec la carte : on reconnaît d'abord un signe qu'on voit, puis on
- *  doit le retrouver à l'oreille seule. */
-function itemFor(id: string, card: Card | undefined): Item | null {
+/** Reconnaître le sens d'un mot ne demande pas de savoir tracer ses lettres, seulement de
+ *  les avoir rencontrées. C'est ce qui permet au vocabulaire d'arriver dès les premiers
+ *  jours au lieu d'attendre la maîtrise de l'alphabet. */
+function canSee(word: Word, cards: Record<string, Card>) {
+  return word.requires.every((letterId) => cards[letterId])
+}
+
+/** Écrire, en revanche, exige de produire chaque signe de mémoire. */
+function canWrite(word: Word, cards: Record<string, Card>) {
+  return word.requires.every((letterId) => cards[letterId] && isMastered(cards[letterId]))
+}
+
+/** Leurres d'un exercice de reconnaissance : d'autres sens de mots, choisis de façon
+ *  déterministe. */
+function wordDistractors(target: Word, pick: (word: Word) => string) {
+  const chosen: string[] = []
+  for (const word of shuffle(words.filter((w) => w.id !== target.id), target.id)) {
+    const value = pick(word)
+    if (value !== pick(target) && !chosen.includes(value)) chosen.push(value)
+    if (chosen.length === 3) break
+  }
+  return chosen
+}
+
+function wordIntroItem(word: Word): Item {
+  return {
+    id: `${word.id}-intro`,
+    kind: 'word-intro',
+    label: 'Nouveau mot',
+    arabic: word.arabic,
+    translit: word.translit,
+    meaning: word.meaning,
+    note: word.note,
+  }
+}
+
+function translateItem(word: Word): Item {
+  return {
+    id: word.id,
+    kind: 'translate',
+    label: 'Que veut dire ce mot ?',
+    arabic: word.arabic,
+    answer: word.meaning,
+    options: [word.meaning, ...wordDistractors(word, (w) => w.meaning)],
+    note: `${word.translit} — ${word.meaning}${word.note ? `. ${word.note}` : ''}`,
+  }
+}
+
+function wordListenItem(word: Word): Item {
+  return {
+    id: word.id,
+    kind: 'listen',
+    label: 'Écoute et choisis le mot',
+    arabic: word.arabic,
+    options: [word.arabic, ...wordDistractors(word, (w) => w.arabic)],
+    note: `${word.translit} — ${word.meaning}`,
+  }
+}
+
+function writeItem(word: Word): Item {
+  return {
+    id: word.id,
+    kind: 'write',
+    label: 'Écris en arabe',
+    prompt: `${word.translit} — ${word.meaning}`,
+    answer: word.arabic,
+    note: word.note,
+  }
+}
+
+/** L'exercice se durcit avec la carte.
+ *
+ *  Lettres : on reconnaît d'abord un signe qu'on voit, puis on doit le retrouver à l'oreille.
+ *
+ *  Mots : on reconnaît le sens, puis on identifie à l'oreille, et seulement en haut de
+ *  l'échelle on écrit. Écrire reste conditionné à la maîtrise de toutes les lettres du mot —
+ *  inutile de demander de tracer des signes qu'on ne maîtrise pas encore. */
+function itemFor(id: string, card: Card | undefined, cards: Record<string, Card>): Item | null {
   const word = wordsById.get(id)
-  if (word) return word
+  if (word) {
+    const reps = card?.reps ?? 0
+    if (reps < 2) return translateItem(word)
+    if (reps < 4) return wordListenItem(word)
+    return canWrite(word, cards) ? writeItem(word) : wordListenItem(word)
+  }
   const letter = lettersById.get(id)
   if (!letter) return null
   return card && card.reps >= 2 ? listenItem(letter) : recognizeItem(letter)
@@ -109,12 +189,12 @@ export function buildSession(
   const writeCap = Math.max(1, Math.round(count * WRITE_SHARE))
 
   /** Ajoute des candidats en respectant la taille de séance et le plafond d'écriture.
-   *  Un mot refusé faute de place est simplement sauté : il reste dû et repassera demain. */
+   *  Un item refusé faute de place est simplement sauté : il reste dû et repassera demain. */
   const take = (candidates: string[], max: number) => {
     let added = 0
     for (const id of candidates) {
       if (added >= max || selected.length >= count) break
-      if (wordsById.has(id)) {
+      if (itemFor(id, cards[id], cards)?.kind === 'write') {
         if (writes >= writeCap) continue
         writes += 1
       }
@@ -126,12 +206,13 @@ export function buildSession(
 
   take(due, count)
 
-  // Un mot n'apparaît qu'une fois toutes ses lettres maîtrisées : on n'écrit pas un mot
-  // dont on ne sait pas tracer les signes.
+  // Un mot entre dans le paquet dès que ses lettres ont été *rencontrées* : à ce stade on ne
+  // demande que d'en reconnaître le sens. La maîtrise complète des lettres n'est exigée que
+  // pour l'écriture, tout en haut de l'échelle (voir `itemFor`).
   const fresh = deck.filter((id) => {
     if (cards[id]) return false
     const word = wordsById.get(id)
-    return !word || word.requires.every((letterId) => cards[letterId] && isMastered(cards[letterId]))
+    return !word || canSee(word, cards)
   })
 
   // Les mots ne font pas la queue derrière les 28 lettres : dès qu'un mot est déblocable,
@@ -156,10 +237,14 @@ export function buildSession(
 
   const items: Item[] = []
   for (const id of selected) {
-    const letter = lettersById.get(id)
-    // Une lettre encore sans carte est d'abord montrée, puis seulement demandée.
-    if (letter && !cards[id]) items.push(teachItem(letter))
-    const item = itemFor(id, cards[id])
+    // Rien n'est demandé avant d'avoir été montré : lettre comme mot ont leur présentation.
+    if (!cards[id]) {
+      const letter = lettersById.get(id)
+      const word = wordsById.get(id)
+      if (letter) items.push(teachItem(letter))
+      else if (word) items.push(wordIntroItem(word))
+    }
+    const item = itemFor(id, cards[id], cards)
     if (item) items.push(item)
     if (items.length >= count) break
   }

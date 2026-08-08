@@ -229,3 +229,9 @@
   border-radius: var(--r-md);
   font-size: var(--t-sm);
 }
+
+/* Même bloc, mais pour une information neutre et non un avertissement. */
+.notice--calm {
+  background: var(--bg-sunken);
+  color: var(--text-muted);
+}

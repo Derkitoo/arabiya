@@ -20,6 +20,7 @@ npm run dev -- --host 127.0.0.1 --port 5190
 
 ```bash
 npm run lint    # ESLint
+npm test        # Vitest — 48 tests sur la logique pure
 npm run build   # typecheck + build production dans dist/
 ```
 
@@ -68,12 +69,36 @@ ailleurs.
 
 ## Types d'exercices
 
-| Type | Écran | Défini dans |
+| Type | Écran | Noté |
 |---|---|---|
-| `teach` | Présentation d'une lettre, rien à répondre | [types.ts](src/content/types.ts) |
-| `recognize` | Un signe arabe, 4 lectures en latin | idem |
-| `listen` | Écoute, 4 signes arabes au choix | idem |
-| `write` | Une translittération, saisie en arabe | idem |
+| `teach` | Présentation d'une lettre | non |
+| `word-intro` | Présentation d'un mot | non |
+| `recognize` | Un signe arabe, 4 lectures en latin | oui |
+| `translate` | Un mot arabe, 4 sens au choix | oui |
+| `listen` | Écoute, 4 graphies au choix (lettres comme mots) | oui |
+| `write` | Une translittération, saisie en arabe | oui |
+
+Tous définis dans [types.ts](src/content/types.ts), rendus dans
+[Session.tsx](src/screens/Session.tsx), assemblés dans [session.ts](src/content/session.ts).
+
+## L'exercice se durcit avec la carte
+
+Le type d'exercice n'est pas fixé par le contenu, il est **déduit de l'état de la carte**.
+
+| Réussites | Lettre | Mot |
+|---|---|---|
+| aucune carte | présentation | présentation |
+| 0–1 | reconnaître le signe | reconnaître le sens |
+| 2–3 | retrouver à l'oreille | retrouver à l'oreille |
+| 4+ | — | écrire |
+
+Deux verrous distincts sur les mots, et c'est ce qui rend le vocabulaire accessible tôt :
+
+- **reconnaître le sens** ne demande que d'avoir *rencontré* les lettres
+- **écrire** exige de les avoir *maîtrisées* — sinon l'exercice reste à l'écoute
+
+Un mot qui atteint 4 réussites mais dont les lettres ne sont pas maîtrisées ne bascule donc
+pas en écriture : on ne demande pas de tracer des signes qu'on ne sait pas encore produire.
 
 Ajouter un type d'exercice se fait à deux endroits seulement : le type dans
 [content/types.ts](src/content/types.ts) et son rendu dans [screens/Session.tsx](src/screens/Session.tsx).
@@ -167,8 +192,12 @@ renvoie la date UTC, ce qui décalait les échéances d'un jour à l'est de Gree
 - ✅ 22 mots, chacun verrouillé tant que ses lettres ne sont pas maîtrisées
 - ✅ Réglages : rythme, niveau, effacement
 - ✅ Migration du schéma 1 vers le 2 sans perte de progression
-- ❌ Pas de tests automatisés — tout est vérifié à la main dans le navigateur
-- ❌ Un seul type d'exercice sur les mots (écriture) : pas de compréhension ni d'écoute
+- ✅ 48 tests sur la logique pure : répétition espacée, dates, séance, contenu, placement
+- ✅ Trois modalités sur les mots — sens, écoute, écriture — servies selon la maîtrise
+- ⚠️ L'audio dépend des voix du système. Un exercice d'écoute sur un appareil sans voix arabe
+  reste jouable mais muet : il faudra des enregistrements réels (voir *Audio* ci-dessous)
+- ❌ Vocabulaire limité à 22 mots, sans thèmes : l'app est à court de contenu vers le 30ᵉ jour
+- ❌ Aucun travail de prononciation : les sons de gorge (ح خ ع غ) ne sont jamais produits
 - ❌ Pas de grammaire, pas de phrases : l'app s'arrête au mot isolé
 
 L'ancienne version (monolithe de 2 635 lignes) a été supprimée ; elle reste consultable dans

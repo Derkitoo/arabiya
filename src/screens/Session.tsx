@@ -33,7 +33,8 @@ export function Session({
   const [playing, setPlaying] = useState(false)
 
   const item = items[index]
-  const expected = item.kind === 'teach' ? '' : item.kind === 'listen' ? item.arabic : item.answer
+  const isIntro = item.kind === 'teach' || item.kind === 'word-intro'
+  const expected = isIntro ? '' : item.kind === 'listen' ? item.arabic : item.answer
   const isCorrect =
     item.kind === 'write'
       ? normalizeArabic(answer) === normalizeArabic(expected)
@@ -41,18 +42,20 @@ export function Session({
 
   // L'ordre des propositions est figé pour un item donné, sinon il change à chaque rendu.
   const options = useMemo(() => {
-    if (item.kind === 'write' || item.kind === 'teach') return []
+    if (item.kind === 'write' || item.kind === 'teach' || item.kind === 'word-intro') return []
     return shuffle(item.options, item.id)
   }, [item])
 
+  const speakable = item.kind === 'listen' || item.kind === 'teach' || item.kind === 'word-intro'
+
   const play = () => {
-    if (item.kind !== 'listen' && item.kind !== 'teach') return
+    if (!speakable) return
     speak(item.arabic, { onStart: () => setPlaying(true), onEnd: () => setPlaying(false) })
   }
 
   // La consigne sonore se déclenche seule : l'utilisateur n'a pas à la demander.
   useEffect(() => {
-    if (item.kind !== 'listen' && item.kind !== 'teach') return
+    if (item.kind !== 'listen' && item.kind !== 'teach' && item.kind !== 'word-intro') return
     speak(item.arabic, { onStart: () => setPlaying(true), onEnd: () => setPlaying(false) })
   }, [item])
 
@@ -90,7 +93,7 @@ export function Session({
         </>
       }
       actions={
-        item.kind === 'teach' ? (
+        isIntro ? (
           <div className="screen__actions">
             <Button block onClick={next}>
               J’ai compris
@@ -126,8 +129,20 @@ export function Session({
         {(item.kind === 'recognize' || item.kind === 'teach') && (
           <p className="prompt__ar ar">{item.arabic}</p>
         )}
+        {(item.kind === 'translate' || item.kind === 'word-intro') && (
+          <p className="prompt__ar prompt__ar--word ar">{item.arabic}</p>
+        )}
         {item.kind === 'write' && <p className="title">{item.prompt}</p>}
       </div>
+
+      {item.kind === 'word-intro' && (
+        <div className="teach">
+          <p className="teach__name">{item.meaning}</p>
+          <p className="subtitle">{item.translit}</p>
+          <SpeakButton onPlay={play} playing={playing} />
+          {item.note && <p className="notice notice--calm">{item.note}</p>}
+        </div>
+      )}
 
       {item.kind === 'teach' && (
         <div className="teach">
@@ -162,7 +177,7 @@ export function Session({
         </div>
       )}
 
-      {item.kind === 'teach' ? null : item.kind === 'write' ? (
+      {isIntro ? null : item.kind === 'write' ? (
         <input
           className="input ar"
           value={answer}
