@@ -12,6 +12,15 @@ const deck: string[] = [...orderedLetters.map((l) => l.id), ...words.map((w) => 
  *  du quota de nouveautés et l'alphabet cesserait d'avancer. */
 const WORDS_PER_SESSION = 2
 
+/** Part maximale de la séance consacrée à l'écriture.
+ *
+ *  Réviser un mot veut toujours dire l'écrire, et écrire est la modalité la plus exigeante :
+ *  il faut produire les signes de mémoire, pas les reconnaître parmi quatre. À mesure que le
+ *  vocabulaire grossit, les révisions dues rempliraient la séance entière — jusqu'à 7 saisies
+ *  sur 11 en simulation. Le surplus est reporté au lendemain : une carte revue avec un jour
+ *  de retard ne perd rien, alors qu'une séance qu'on redoute est une séance qu'on saute. */
+const WRITE_SHARE = 0.4
+
 /** Choisit 3 leurres : d'abord les lettres de la même famille (celles qu'on confond
  *  vraiment), complétées si besoin par d'autres lettres, de façon déterministe. */
 function distractors(target: Letter, pick: (letter: Letter) => string) {
@@ -95,7 +104,27 @@ export function buildSession(
     .filter((id) => isDue(cards[id], today))
     .sort((a, b) => cards[a].due.localeCompare(cards[b].due) || cards[b].lapses - cards[a].lapses)
 
-  const selected = due.slice(0, count)
+  const selected: string[] = []
+  let writes = 0
+  const writeCap = Math.max(1, Math.round(count * WRITE_SHARE))
+
+  /** Ajoute des candidats en respectant la taille de séance et le plafond d'écriture.
+   *  Un mot refusé faute de place est simplement sauté : il reste dû et repassera demain. */
+  const take = (candidates: string[], max: number) => {
+    let added = 0
+    for (const id of candidates) {
+      if (added >= max || selected.length >= count) break
+      if (wordsById.has(id)) {
+        if (writes >= writeCap) continue
+        writes += 1
+      }
+      selected.push(id)
+      added += 1
+    }
+    return added
+  }
+
+  take(due, count)
 
   // Un mot n'apparaît qu'une fois toutes ses lettres maîtrisées : on n'écrit pas un mot
   // dont on ne sait pas tracer les signes.
@@ -112,20 +141,17 @@ export function buildSession(
   const freshWords = fresh.filter((id) => wordsById.has(id))
   const freshLetters = fresh.filter((id) => !wordsById.has(id))
   const slots = Math.min(newCap, count - selected.length)
-  const wordSlots =
-    freshLetters.length === 0
-      ? slots
-      : Math.min(WORDS_PER_SESSION, freshWords.length, Math.max(0, slots - 1))
+  const wordSlots = freshLetters.length === 0 ? slots : Math.max(0, Math.min(WORDS_PER_SESSION, slots - 1))
 
-  selected.push(...freshWords.slice(0, wordSlots))
-  selected.push(...freshLetters.slice(0, slots - wordSlots))
+  const addedWords = take(freshWords, wordSlots)
+  take(freshLetters, slots - addedWords)
 
   // Il reste de la place : on avance des révisions plutôt que de servir une séance courte.
   if (selected.length < count) {
     const ahead = seen
       .filter((id) => !isDue(cards[id], today))
       .sort((a, b) => cards[a].due.localeCompare(cards[b].due))
-    selected.push(...ahead.slice(0, count - selected.length))
+    take(ahead, count - selected.length)
   }
 
   const items: Item[] = []

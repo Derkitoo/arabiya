@@ -138,6 +138,18 @@ Les mots ne font pas la queue derrière les 28 lettres : dès qu'un mot est déb
 une part réservée du quota de nouveautés (`WORDS_PER_SESSION`). Sans cette réserve, le premier
 mot n'arrivait qu'au 11ᵉ jour ; avec, il arrive au 3ᵉ.
 
+## Plafond d'écriture
+
+Réviser un mot veut toujours dire l'écrire, et écrire est la modalité la plus exigeante : il
+faut produire les signes de mémoire, pas les reconnaître parmi quatre. À mesure que le
+vocabulaire grossit, les révisions dues rempliraient la séance entière — jusqu'à 7 saisies sur
+11 en simulation.
+
+L'écriture est donc plafonnée à `WRITE_SHARE` (40 %) de la séance. Le surplus est reporté au
+lendemain : une carte revue avec un jour de retard ne perd rien, alors qu'une séance qu'on
+redoute est une séance qu'on saute. Mesuré sur 60 jours : 4 saisies par séance au maximum,
+aucune séance déséquilibrée.
+
 L'exercice se durcit avec la carte : on reconnaît d'abord un signe qu'on voit, puis dès la
 2ᵉ réussite on doit le retrouver **à l'oreille seule**.
 
@@ -157,8 +169,6 @@ renvoie la date UTC, ce qui décalait les échéances d'un jour à l'est de Gree
 - ✅ Migration du schéma 1 vers le 2 sans perte de progression
 - ❌ Pas de tests automatisés — tout est vérifié à la main dans le navigateur
 - ❌ Un seul type d'exercice sur les mots (écriture) : pas de compréhension ni d'écoute
-- ⚠️ Les révisions de mots ne sont pas plafonnées : une séance tardive peut compter jusqu'à
-  7 exercices d'écriture sur 11, ce qui est lourd puisque c'est la modalité la plus dure
 - ❌ Pas de grammaire, pas de phrases : l'app s'arrête au mot isolé
 
 L'ancienne version (monolithe de 2 635 lignes) a été supprimée ; elle reste consultable dans
