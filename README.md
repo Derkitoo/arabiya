@@ -161,8 +161,8 @@ renvoie la date UTC, ce qui décalait les échéances d'un jour à l'est de Gree
   7 exercices d'écriture sur 11, ce qui est lourd puisque c'est la modalité la plus dure
 - ❌ Pas de grammaire, pas de phrases : l'app s'arrête au mot isolé
 
-L'ancienne version (monolithe de 2 635 lignes) est conservée dans `_legacy_src/` en attendant
-d'être supprimée.
+L'ancienne version (monolithe de 2 635 lignes) a été supprimée ; elle reste consultable dans
+le premier commit du dépôt.
 
 ## Limites assumées
 
