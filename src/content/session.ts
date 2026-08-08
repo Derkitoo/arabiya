@@ -1,12 +1,16 @@
 import { shuffle } from '../lib/shuffle'
 import { isDue, isMastered, type Card } from '../lib/srs'
-import { letters, lettersById, type Letter } from './letters'
+import { letters, lettersById, orderedLetters, type Letter } from './letters'
 import { words, wordsById } from './words'
 import { isScored, type Item } from './types'
 
-/** Ordre d'introduction : tout l'alphabet, puis les mots. On ne fait pas écrire un mot
- *  avant d'avoir rencontré des lettres. */
-const deck: string[] = [...letters.map((l) => l.id), ...words.map((w) => w.id)]
+/** Ordre d'introduction : les lettres par fréquence d'usage (voir `teachingOrder`), puis les
+ *  mots. On ne fait pas écrire un mot avant d'avoir rencontré des lettres. */
+const deck: string[] = [...orderedLetters.map((l) => l.id), ...words.map((w) => w.id)]
+
+/** Nouveaux mots par séance, au maximum. Au-delà, le vocabulaire prendrait toute la place
+ *  du quota de nouveautés et l'alphabet cesserait d'avancer. */
+const WORDS_PER_SESSION = 2
 
 /** Choisit 3 leurres : d'abord les lettres de la même famille (celles qu'on confond
  *  vraiment), complétées si besoin par d'autres lettres, de façon déterministe. */
@@ -100,7 +104,21 @@ export function buildSession(
     const word = wordsById.get(id)
     return !word || word.requires.every((letterId) => cards[letterId] && isMastered(cards[letterId]))
   })
-  selected.push(...fresh.slice(0, Math.min(newCap, count - selected.length)))
+
+  // Les mots ne font pas la queue derrière les 28 lettres : dès qu'un mot est déblocable,
+  // il prend une part réservée du quota de nouveautés. Sans cette réserve, le vocabulaire
+  // n'apparaît qu'une fois l'alphabet entièrement introduit — soit une dizaine de jours de
+  // signes isolés avant le premier mot réel.
+  const freshWords = fresh.filter((id) => wordsById.has(id))
+  const freshLetters = fresh.filter((id) => !wordsById.has(id))
+  const slots = Math.min(newCap, count - selected.length)
+  const wordSlots =
+    freshLetters.length === 0
+      ? slots
+      : Math.min(WORDS_PER_SESSION, freshWords.length, Math.max(0, slots - 1))
+
+  selected.push(...freshWords.slice(0, wordSlots))
+  selected.push(...freshLetters.slice(0, slots - wordSlots))
 
   // Il reste de la place : on avance des révisions plutôt que de servir une séance courte.
   if (selected.length < count) {

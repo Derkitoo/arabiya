@@ -299,3 +299,24 @@ export const letters: Letter[] = [
 ]
 
 export const lettersById = new Map(letters.map((letter) => [letter.id, letter]))
+
+/** Ordre d'introduction, par fréquence d'usage en arabe — pas par ordre alphabétique.
+ *
+ *  L'ordre de l'alphabet plaçait yā en 28ᵉ position : un mot aussi banal que بيت attendait
+ *  la toute fin, alors que ses lettres sont parmi les plus simples. Introduire les lettres
+ *  les plus fréquentes d'abord débloque du vocabulaire réel en quelques jours.
+ *
+ *  Effet secondaire utile : les lettres d'une même famille (ب ت ث ن ي) se retrouvent
+ *  espacées, donc chacune est solidement acquise avant de rencontrer sa voisine à points. */
+export const teachingOrder = [
+  'alif', 'lam', 'ya', 'mim', 'waw', 'nun', 'ra', 'ta', 'ba', 'ha',
+  'ayn', 'dal', 'sin', 'fa', 'kaf', 'qaf', 'hha', 'jim', 'shin', 'sad',
+  'kha', 'zay', 'tta', 'dhal', 'tha', 'dad', 'ghayn', 'dha',
+]
+
+/** Les 28 lettres dans l'ordre où l'app les enseigne. */
+export const orderedLetters: Letter[] = teachingOrder.map((id) => {
+  const letter = lettersById.get(id)
+  if (!letter) throw new Error(`teachingOrder référence une lettre inconnue : ${id}`)
+  return letter
+})

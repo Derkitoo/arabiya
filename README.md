@@ -125,6 +125,19 @@ item porte une carte : réussites consécutives, facteur de facilité (1.3 à 2.
 plus en retard et les plus ratées en tête), puis un quota de nouveautés (la moitié de la
 séance au maximum), puis de la révision en avance s'il reste de la place.
 
+## Ordre d'introduction
+
+Les lettres sont introduites **par fréquence d'usage**, pas dans l'ordre de l'alphabet
+(`teachingOrder` dans [content/letters.ts](src/content/letters.ts)) : ا ل ي م و ن ر ت ب ه …
+
+L'ordre alphabétique plaçait yā en 28ᵉ position, donc un mot aussi banal que بيت attendait la
+toute fin. Effet secondaire utile : les lettres d'une même famille (ب ت ث ن ي) se retrouvent
+espacées, donc chacune est acquise avant qu'on rencontre sa voisine à points.
+
+Les mots ne font pas la queue derrière les 28 lettres : dès qu'un mot est déblocable, il prend
+une part réservée du quota de nouveautés (`WORDS_PER_SESSION`). Sans cette réserve, le premier
+mot n'arrivait qu'au 11ᵉ jour ; avec, il arrive au 3ᵉ.
+
 L'exercice se durcit avec la carte : on reconnaît d'abord un signe qu'on voit, puis dès la
 2ᵉ réussite on doit le retrouver **à l'oreille seule**.
 
@@ -144,6 +157,8 @@ renvoie la date UTC, ce qui décalait les échéances d'un jour à l'est de Gree
 - ✅ Migration du schéma 1 vers le 2 sans perte de progression
 - ❌ Pas de tests automatisés — tout est vérifié à la main dans le navigateur
 - ❌ Un seul type d'exercice sur les mots (écriture) : pas de compréhension ni d'écoute
+- ⚠️ Les révisions de mots ne sont pas plafonnées : une séance tardive peut compter jusqu'à
+  7 exercices d'écriture sur 11, ce qui est lourd puisque c'est la modalité la plus dure
 - ❌ Pas de grammaire, pas de phrases : l'app s'arrête au mot isolé
 
 L'ancienne version (monolithe de 2 635 lignes) est conservée dans `_legacy_src/` en attendant
