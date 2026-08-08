@@ -1,0 +1,231 @@
+.hero {
+  display: grid;
+  gap: var(--sp-3);
+  text-align: center;
+}
+
+.hero__mark {
+  justify-self: center;
+  display: grid;
+  place-items: center;
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: var(--r-lg);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--font-ar);
+  font-size: var(--ar-md);
+}
+
+/* Marque réduite, en en-tête d'écran. */
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--font-ar);
+  font-size: var(--t-lg);
+}
+
+/* Avancement dans l'alphabet : la seule mesure qui compte vraiment pour l'utilisateur. */
+.alphabet {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.alphabet__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+/* Réglages : sections empilées, séparées par un filet plutôt que par des cartes. */
+.settings-block {
+  display: grid;
+  gap: var(--sp-3);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-block:last-of-type {
+  border-bottom: none;
+}
+
+.settings-danger {
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  background: var(--bad-100);
+  border-radius: var(--r-md);
+}
+
+.settings-danger .feedback__title {
+  color: var(--bad-600);
+  font-size: var(--t-md);
+}
+
+/* Bouton d'accès aux réglages, discret, à l'opposé de l'action principale. */
+.top-spacer {
+  flex: 1;
+}
+
+/* Écran de présentation d'une lettre : le seul qui donne au lieu de demander. */
+.teach {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-3);
+  text-align: center;
+}
+
+.teach__name {
+  font-size: var(--t-xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.teach__forms {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-2);
+  width: 100%;
+  margin-top: var(--sp-2);
+}
+
+.teach__form {
+  display: grid;
+  gap: var(--sp-1);
+  padding: var(--sp-3) var(--sp-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.teach__form-glyph {
+  font-size: var(--ar-md);
+  line-height: 1.2;
+}
+
+/* Bloc d'écoute : le bouton, et rien d'autre à portée de main. */
+.listen {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-3);
+}
+
+/* Carte unique de l'accueil : la seule chose à faire aujourd'hui. */
+.today {
+  display: grid;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.today__eyebrow {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-3);
+}
+
+.stat {
+  display: grid;
+  gap: var(--sp-1);
+  padding: var(--sp-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  text-align: center;
+}
+
+.stat__value {
+  font-size: var(--t-xl);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.stat__label {
+  font-size: var(--t-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Choix de l'objectif : options empilées, une seule sélection. */
+.options {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: var(--bg-surface);
+  border: 2px solid var(--border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.option--selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.option__title {
+  font-weight: 650;
+}
+
+.option__meta {
+  font-size: var(--t-sm);
+  color: var(--text-muted);
+}
+
+.summary-score {
+  display: grid;
+  place-items: center;
+  gap: var(--sp-1);
+  width: 9rem;
+  height: 9rem;
+  justify-self: center;
+  border-radius: var(--r-full);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.summary-score__value {
+  font-size: var(--t-2xl);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.summary-score__label {
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.notice {
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--gold-100);
+  color: var(--gold-600);
+  border-radius: var(--r-md);
+  font-size: var(--t-sm);
+}

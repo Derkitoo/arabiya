@@ -1,0 +1,114 @@
+/* Design tokens — source unique de vérité pour couleurs, espacements, typo.
+   Aucune valeur brute (#hex, px) ne doit apparaître ailleurs que dans ce fichier. */
+
+:root {
+  /* Palette de marque : vert profond (calme, évoque l'art islamique) + or chaud */
+  --brand-900: #0e3f34;
+  --brand-700: #1f6f5c;
+  --brand-500: #2f9179;
+  --brand-100: #d8ece5;
+  --brand-050: #eef7f4;
+
+  --gold-600: #a97b1e;
+  --gold-400: #d9a72e;
+  --gold-100: #f6e9c8;
+
+  /* États */
+  --ok-600: #15803d;
+  --ok-100: #dcfce7;
+  --bad-600: #c2352b;
+  --bad-100: #fde7e5;
+
+  /* Neutres chauds (papier, pas gris clinique) */
+  --ink-900: #17150f;
+  --ink-700: #3d3830;
+  --ink-500: #6b6459;
+  --ink-300: #a8a094;
+  --ink-100: #e6e0d6;
+  --paper: #faf7f2;
+  --surface: #ffffff;
+
+  /* Rôles sémantiques — c'est ce qu'on utilise dans les composants */
+  --bg: var(--paper);
+  --bg-surface: var(--surface);
+  --bg-sunken: var(--brand-050);
+  --text: var(--ink-900);
+  --text-muted: var(--ink-500);
+  --text-inverse: #ffffff;
+  --border: var(--ink-100);
+  --border-strong: var(--ink-300);
+  --accent: var(--brand-700);
+  --accent-hover: var(--brand-900);
+  --accent-soft: var(--brand-100);
+  --focus: var(--gold-400);
+
+  /* Espacements — échelle 4px */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+
+  /* Rayons */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-full: 999px;
+
+  /* Ombres — discrètes, teintées de la marque */
+  --shadow-1: 0 1px 2px rgba(23, 21, 15, 0.06);
+  --shadow-2: 0 4px 16px rgba(23, 21, 15, 0.08);
+  --shadow-3: 0 -8px 24px rgba(23, 21, 15, 0.1);
+
+  /* Typographie */
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-ar: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', 'Traditional Arabic',
+    'Segoe UI', serif;
+
+  --t-xs: 0.75rem;
+  --t-sm: 0.875rem;
+  --t-md: 1rem;
+  --t-lg: 1.25rem;
+  --t-xl: 1.75rem;
+  --t-2xl: 2.25rem;
+
+  /* Arabe : toujours plus grand que le latin à taille équivalente */
+  --ar-md: 2rem;
+  --ar-lg: 3.5rem;
+  --ar-xl: 5rem;
+
+  /* Mouvement */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur: 220ms;
+
+  /* Gabarit mobile-first : l'app reste une colonne, même sur grand écran */
+  --app-max: 30rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12100c;
+    --bg-surface: #1c1915;
+    --bg-sunken: #16221e;
+    --text: #f5f1e9;
+    --text-muted: #a8a094;
+    --border: #2e2a24;
+    --border-strong: #4a443b;
+    --accent: var(--brand-500);
+    --accent-hover: #46a98f;
+    --accent-soft: #1a3b33;
+    --ok-100: #14301f;
+    --bad-100: #3a1d1a;
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 4px 16px rgba(0, 0, 0, 0.45);
+    --shadow-3: 0 -8px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur: 0ms;
+  }
+}
