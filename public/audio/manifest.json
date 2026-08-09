@@ -434,11 +434,11 @@
       "text": "جديد"
     }
   ],
-  "lastAuditAt": "2026-08-09T22:02:49.433Z",
+  "lastAuditAt": "2026-08-09T22:34:07.917Z",
   "summary": {
     "totalLetters": 28,
-    "localLetters": 0,
-    "fallbackLetters": 28,
+    "localLetters": 28,
+    "fallbackLetters": 0,
     "totalWords": 77,
     "localWords": 6,
     "fallbackWords": 71
