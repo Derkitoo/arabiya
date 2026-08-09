@@ -25,9 +25,14 @@ export function pronunciationPath(kind: AudioKind, id: string, ext = 'mp3') {
 }
 
 function stopCurrentAudio() {
-  currentAudio?.pause()
-  currentAudio = null
-  if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel()
+  if (currentAudio) {
+    currentAudio.pause()
+    currentAudio.currentTime = 0
+    currentAudio = null
+  }
+  if (typeof speechSynthesis !== 'undefined') {
+    speechSynthesis.cancel()
+  }
 }
 
 export function hasArabicVoice() {
@@ -99,6 +104,8 @@ export function playPronunciation(
   },
   { onStart, onEnd, onFallback, onSourceResolved }: AudioCallbacks = {},
 ) {
+  stopCurrentAudio()
+
   if (typeof Audio === 'undefined') {
     onFallback?.()
     onSourceResolved?.({ source: 'fallback' })
@@ -106,40 +113,58 @@ export function playPronunciation(
     return
   }
 
-  stopCurrentAudio()
   const exts = ['mp3', 'webm', 'ogg', 'wav']
   let index = 0
+  let isHandled = false
+  let isPlayingStarted = false
+
+  const tryNext = () => {
+    if (isHandled || isPlayingStarted) return
+    isHandled = true
+    index += 1
+    trySource()
+  }
 
   const trySource = () => {
     const ext = exts[index]
     if (!ext) {
-      onFallback?.()
-      onSourceResolved?.({ source: 'fallback' })
-      speak(text, { onStart, onEnd })
+      if (!isPlayingStarted) {
+        onFallback?.()
+        onSourceResolved?.({ source: 'fallback' })
+        speak(text, { onStart, onEnd })
+      }
       return
     }
 
+    isHandled = false
     const src = pronunciationPath(kind, id, ext)
     const audio = new Audio(src)
     currentAudio = audio
     audio.preload = 'auto'
+
     audio.onplaying = () => {
+      isPlayingStarted = true
       onSourceResolved?.({ source: 'local', ext })
       knownAudioCache.set(`${kind}:${id}`, { source: 'local', ext })
       onStart?.()
     }
+
     audio.onended = () => {
       if (currentAudio === audio) currentAudio = null
       onEnd?.()
     }
+
     audio.onerror = () => {
-      index += 1
-      trySource()
+      tryNext()
     }
-    audio.play().catch(() => {
-      index += 1
-      trySource()
-    })
+
+    audio.play()
+      .then(() => {
+        isPlayingStarted = true
+      })
+      .catch(() => {
+        tryNext()
+      })
   }
 
   trySource()
