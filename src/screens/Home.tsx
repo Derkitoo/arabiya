@@ -38,8 +38,8 @@ export function Home({
     <Screen
       top={
         <>
-          <span className="brand-mark ar" aria-hidden="true">
-            ض
+          <span className="brand-mark" aria-hidden="true">
+            <img src="./logo.png" alt="Arabiya Logo" width="40" height="40" />
           </span>
           <strong>Arabiya</strong>
           <span className="top-spacer" />
