@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "arabiya-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--host", "127.0.0.1", "--port", "5190"],
+      "port": 5190,
+      "url": "http://127.0.0.1:5190"
+    },
+    {
+      "name": "arabiya-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "preview", "--", "--host", "127.0.0.1", "--port", "5191"],
+      "port": 5191,
+      "url": "http://127.0.0.1:5191"
+    }
+  ]
+}
