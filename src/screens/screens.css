@@ -235,3 +235,159 @@
   background: var(--bg-sunken);
   color: var(--text-muted);
 }
+
+/* Bibliothèque audio : un répertoire dense pour écouter sans lancer une session. */
+.sound-hero {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.sound-coverage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: var(--t-sm);
+}
+
+.sound-coverage__count {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.sound-tools {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  padding: 0.25rem;
+  background: var(--bg-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+}
+
+.tab {
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: var(--r-full);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.tab--active {
+  background: var(--bg-surface);
+  color: var(--text);
+  box-shadow: var(--shadow-1);
+}
+
+.sound-search {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: var(--sp-3) var(--sp-4);
+  border: 2px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.sound-search:focus {
+  border-color: var(--accent);
+}
+
+.sound-sections,
+.sound-list {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.sound-section {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.sound-section h2 {
+  font-size: var(--t-sm);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sound-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.sound-row .btn-audio {
+  width: 3.25rem;
+  height: 3.25rem;
+}
+
+.sound-row .btn-audio svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.sound-row__glyph {
+  display: grid;
+  place-items: center;
+  min-width: 3.5rem;
+  min-height: 3.5rem;
+  padding-inline: var(--sp-2);
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: var(--ar-md);
+}
+
+.sound-row__glyph--word {
+  min-width: 5rem;
+  font-size: var(--ar-sm);
+}
+
+.sound-row__body {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.sound-row__body span {
+  color: var(--text-muted);
+  font-size: var(--t-sm);
+}
+
+.badge-audio {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--r-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.badge-audio--local {
+  background: var(--ok-100);
+  color: var(--ok-600);
+  border: 1px solid var(--ok-300);
+}
+
+.badge-audio--fallback {
+  background: var(--bg-sunken);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}

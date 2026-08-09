@@ -13,6 +13,7 @@ export function Home({
   lettersTotal,
   onStart,
   onOpenSettings,
+  onOpenSounds,
 }: {
   profile: Profile
   screens: number
@@ -23,6 +24,7 @@ export function Home({
   lettersTotal: number
   onStart: () => void
   onOpenSettings: () => void
+  onOpenSounds: () => void
 }) {
   const doneToday = profile.activeDays.includes(todayKey())
   const streak = streakOf(profile.activeDays)
@@ -48,6 +50,9 @@ export function Home({
       }
       actions={
         <div className="screen__actions">
+          <Button block variant="secondary" onClick={onOpenSounds}>
+            Sons : lettres et mots
+          </Button>
           <Button block onClick={onStart}>
             {doneToday ? 'Continuer quand même' : 'Commencer la session'}
           </Button>

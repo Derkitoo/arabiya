@@ -4,6 +4,7 @@ import { Onboarding } from './screens/Onboarding'
 import { Placement } from './screens/Placement'
 import { Session, type SessionResult } from './screens/Session'
 import { Settings } from './screens/Settings'
+import { Sounds } from './screens/Sounds'
 import { Summary } from './screens/Summary'
 import { buildSession, describeSession, dueToday } from './content/session'
 import { letters, lettersById, type LetterFamily } from './content/letters'
@@ -16,6 +17,7 @@ type Route =
   | { name: 'home' }
   | { name: 'session' }
   | { name: 'settings' }
+  | { name: 'sounds' }
   | { name: 'placement' }
   | { name: 'summary'; correct: number; total: number }
 
@@ -103,6 +105,7 @@ export default function App() {
           lettersTotal={letters.length}
           onStart={() => setRoute({ name: 'session' })}
           onOpenSettings={() => setRoute({ name: 'settings' })}
+          onOpenSounds={() => setRoute({ name: 'sounds' })}
         />
       )}
       {route.name === 'session' && (
@@ -122,6 +125,7 @@ export default function App() {
           onBack={() => setRoute({ name: 'home' })}
         />
       )}
+      {route.name === 'sounds' && <Sounds onBack={() => setRoute({ name: 'home' })} />}
       {route.name === 'placement' && (
         <Placement onDone={applyPlacement} onSkip={() => setRoute({ name: 'home' })} />
       )}

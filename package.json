@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build -- .",
     "lint": "eslint .",
+    "audio:fetch": "node scripts/fetch-commons-audio.mjs",
+    "audio:audit": "node scripts/audit-audio.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest"

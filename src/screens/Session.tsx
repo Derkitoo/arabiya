@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Feedback, ProgressBar, Screen, SpeakButton } from '../ui'
-import { hasArabicVoice, speak } from '../lib/speech'
+import { hasArabicVoice, playPronunciation, type AudioKind } from '../lib/speech'
 import { shuffle } from '../lib/shuffle'
 import { isScored, type Item } from '../content/types'
+import { lettersById } from '../content/letters'
+import { wordsById } from '../content/words'
 import './screens.css'
 
 export type SessionResult = { id: string; correct: boolean }
@@ -15,6 +17,14 @@ function normalizeArabic(value: string) {
     .replace(/[آأإ]/g, 'ا')
     .replace(/\s+/g, '')
     .trim()
+}
+
+function audioTarget(item: Item): { kind: AudioKind; id: string; text: string } | null {
+  if (item.kind !== 'listen' && item.kind !== 'teach' && item.kind !== 'word-intro') return null
+  const id = item.id.replace(/-(teach|intro)$/, '')
+  if (wordsById.has(id)) return { kind: 'word', id, text: item.arabic }
+  if (lettersById.has(id)) return { kind: 'letter', id, text: item.arabic }
+  return null
 }
 
 export function Session({
@@ -47,16 +57,21 @@ export function Session({
   }, [item])
 
   const speakable = item.kind === 'listen' || item.kind === 'teach' || item.kind === 'word-intro'
+  const target = audioTarget(item)
 
   const play = () => {
-    if (!speakable) return
-    speak(item.arabic, { onStart: () => setPlaying(true), onEnd: () => setPlaying(false) })
+    if (!speakable || !target) return
+    playPronunciation(target, { onStart: () => setPlaying(true), onEnd: () => setPlaying(false) })
   }
 
   // La consigne sonore se déclenche seule : l'utilisateur n'a pas à la demander.
   useEffect(() => {
-    if (item.kind !== 'listen' && item.kind !== 'teach' && item.kind !== 'word-intro') return
-    speak(item.arabic, { onStart: () => setPlaying(true), onEnd: () => setPlaying(false) })
+    const nextTarget = audioTarget(item)
+    if (!nextTarget) return
+    playPronunciation(nextTarget, {
+      onStart: () => setPlaying(true),
+      onEnd: () => setPlaying(false),
+    })
   }, [item])
 
   const next = () => {
