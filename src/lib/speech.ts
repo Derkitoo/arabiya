@@ -19,7 +19,9 @@ let currentAudio: HTMLAudioElement | null = null
 const knownAudioCache = new Map<string, AudioSourceInfo>()
 
 export function pronunciationPath(kind: AudioKind, id: string, ext = 'mp3') {
-  return `/audio/${kind}s/${id}.${ext}`
+  const base = import.meta.env.BASE_URL || '/'
+  const prefix = base.endsWith('/') ? base : `${base}/`
+  return `${prefix}audio/${kind}s/${id}.${ext}`
 }
 
 function stopCurrentAudio() {
@@ -49,7 +51,8 @@ export async function checkAudioSource(kind: AudioKind, id: string): Promise<Aud
   for (const ext of exts) {
     try {
       const res = await fetch(pronunciationPath(kind, id, ext), { method: 'HEAD' })
-      if (res.ok) {
+      const contentType = res.headers.get('content-type') || ''
+      if (res.ok && !contentType.includes('text/html')) {
         const info: AudioSourceInfo = { source: 'local', ext }
         knownAudioCache.set(cacheKey, info)
         return info
