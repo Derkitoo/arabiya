@@ -42,7 +42,7 @@ button {
   border-radius: var(--r-sm);
 }
 
-/* L'app vit dans une colonne unique, centrée au-delà du mobile. */
+/* L'app vit dans une colonne unique, centrée au-delà du mobile avec support safe-area PWA. */
 .app-frame {
   width: 100%;
   max-width: var(--app-max);
@@ -52,6 +52,10 @@ button {
   flex-direction: column;
   background: var(--bg);
   position: relative;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 @media (min-width: 40rem) {
