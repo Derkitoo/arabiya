@@ -508,7 +508,7 @@
   color: var(--text-muted);
 }
 
-/* Drawing Canvas & Atelier tactile */
+/* Drawing Canvas & Atelier tactile (Adapté Mobile) */
 .canvas-wrapper {
   display: grid;
   gap: var(--sp-3);
@@ -517,7 +517,8 @@
 
 .canvas-pad {
   width: 100%;
-  height: 16rem;
+  height: 14rem;
+  max-height: 220px;
   background: var(--bg-surface);
   border: 2px dashed var(--border);
   border-radius: var(--r-md);
@@ -528,11 +529,11 @@
 .canvas-controls {
   display: flex;
   gap: var(--sp-2);
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 .canvas-btn {
-  padding: var(--sp-2) var(--sp-3);
+  padding: var(--sp-2) var(--sp-4);
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
   background: var(--bg-surface);
@@ -547,31 +548,101 @@
   cursor: not-allowed;
 }
 
-.trace-letter-picker {
+/* Navigation ‹ lettre › de l'Atelier d'écriture */
+.trace-nav-header {
   display: flex;
-  overflow-x: auto;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--sp-2);
-  padding: var(--sp-2) 0;
-  -webkit-overflow-scrolling: touch;
+  padding: var(--sp-3);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
 }
 
-.trace-letter-btn {
-  min-width: 3rem;
+.trace-nav-btn {
+  display: grid;
+  place-items: center;
+  width: 3rem;
   height: 3rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  background: var(--bg-sunken);
+  color: var(--text);
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.trace-current-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.trace-current-glyph {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: var(--ar-md);
+}
+
+.trace-current-info h2 {
+  font-size: var(--t-md);
+  font-weight: 700;
+}
+
+.trace-current-sub {
+  font-size: var(--t-xs);
+  color: var(--text-muted);
+}
+
+.trace-grid-toggle {
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px dashed var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg-sunken);
+  color: var(--text-muted);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* Grille 4×7 mobile ultra-optimisée pour les 28 lettres */
+.trace-grid-picker {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
+  padding: var(--sp-3);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.trace-grid-btn {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
   background: var(--bg-surface);
   color: var(--text);
   font-size: var(--ar-sm);
   cursor: pointer;
-  flex-shrink: 0;
 }
 
-.trace-letter-btn--active {
+.trace-grid-btn--active {
   border-color: var(--accent);
   background: var(--accent-soft);
   color: var(--accent);
   font-weight: 700;
+  box-shadow: var(--shadow-1);
 }
 
 .trace-card {
@@ -583,15 +654,46 @@
   border-radius: var(--r-md);
 }
 
-.trace-card__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+/* Formes attachées en grille 4 colonnes mobile */
+.trace-forms-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: var(--bg-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
 }
 
-.trace-card__family {
-  font-size: var(--t-xs);
+.trace-form-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  padding: var(--sp-2) 0;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
   color: var(--text-muted);
+  cursor: pointer;
+}
+
+.trace-form-tab--active {
+  background: var(--bg-surface);
+  color: var(--accent);
+  box-shadow: var(--shadow-1);
+}
+
+.trace-form-glyph {
+  font-size: var(--ar-sm);
+  line-height: 1.1;
+}
+
+.trace-form-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: var(--font-ui);
 }
 
 /* Exercices de réordonnancement de phrases */
