@@ -5,12 +5,12 @@ import { shuffle } from '../lib/shuffle'
 import { isScored, type Item } from '../content/types'
 import { lettersById } from '../content/letters'
 import { wordsById } from '../content/words'
+import { phrasesById } from '../content/phrases'
 import './screens.css'
 
 export type SessionResult = { id: string; correct: boolean }
 
-/** Compare deux graphies arabes en ignorant voyelles courtes, tatweel et formes de hamza :
-   à ce stade on valide le squelette consonantique, pas la vocalisation. */
+/** Compare deux graphies arabes en ignorant voyelles courtes, tatweel et formes de hamza. */
 function normalizeArabic(value: string) {
   return value
     .replace(/[ً-ْـ]/g, '')
@@ -20,8 +20,16 @@ function normalizeArabic(value: string) {
 }
 
 function audioTarget(item: Item): { kind: AudioKind; id: string; text: string } | null {
-  if (item.kind !== 'listen' && item.kind !== 'teach' && item.kind !== 'word-intro') return null
+  if (
+    item.kind !== 'listen' &&
+    item.kind !== 'teach' &&
+    item.kind !== 'word-intro' &&
+    item.kind !== 'phrase-intro'
+  )
+    return null
+
   const id = item.id.replace(/-(teach|intro)$/, '')
+  if (phrasesById.has(id)) return { kind: 'phrase', id, text: item.arabic }
   if (wordsById.has(id)) return { kind: 'word', id, text: item.arabic }
   if (lettersById.has(id)) return { kind: 'letter', id, text: item.arabic }
   return null
@@ -38,25 +46,47 @@ export function Session({
 }) {
   const [index, setIndex] = useState(0)
   const [answer, setAnswer] = useState('')
+  const [selectedWords, setSelectedWords] = useState<string[]>([])
   const [checked, setChecked] = useState(false)
   const [results, setResults] = useState<SessionResult[]>([])
   const [playing, setPlaying] = useState(false)
 
   const item = items[index]
-  const isIntro = item.kind === 'teach' || item.kind === 'word-intro'
-  const expected = isIntro ? '' : item.kind === 'listen' ? item.arabic : item.answer
+  const isIntro = item.kind === 'teach' || item.kind === 'word-intro' || item.kind === 'phrase-intro'
+
+  const expected = isIntro
+    ? ''
+    : item.kind === 'listen'
+      ? item.arabic
+      : item.kind === 'phrase-reorder'
+        ? item.expectedOrder.join(' ')
+        : item.answer
+
   const isCorrect =
     item.kind === 'write'
       ? normalizeArabic(answer) === normalizeArabic(expected)
-      : answer === expected
+      : item.kind === 'phrase-reorder'
+        ? selectedWords.join(' ') === expected
+        : answer === expected
 
-  // L'ordre des propositions est figé pour un item donné, sinon il change à chaque rendu.
   const options = useMemo(() => {
-    if (item.kind === 'write' || item.kind === 'teach' || item.kind === 'word-intro') return []
+    if (
+      item.kind === 'write' ||
+      item.kind === 'teach' ||
+      item.kind === 'word-intro' ||
+      item.kind === 'phrase-intro' ||
+      item.kind === 'phrase-reorder'
+    )
+      return []
     return shuffle(item.options, item.id)
   }, [item])
 
-  const speakable = item.kind === 'listen' || item.kind === 'teach' || item.kind === 'word-intro'
+  const speakable =
+    item.kind === 'listen' ||
+    item.kind === 'teach' ||
+    item.kind === 'word-intro' ||
+    item.kind === 'phrase-intro'
+
   const target = audioTarget(item)
 
   const play = () => {
@@ -64,7 +94,6 @@ export function Session({
     playPronunciation(target, { onStart: () => setPlaying(true), onEnd: () => setPlaying(false) })
   }
 
-  // La consigne sonore se déclenche seule : l'utilisateur n'a pas à la demander.
   useEffect(() => {
     const nextTarget = audioTarget(item)
     if (!nextTarget) return
@@ -75,7 +104,6 @@ export function Session({
   }, [item])
 
   const next = () => {
-    // Un écran de présentation ne produit pas de résultat : il n'y avait rien à réussir.
     const all = isScored(item) ? [...results, { id: item.id, correct: isCorrect }] : results
     if (index + 1 >= items.length) {
       onFinish(all)
@@ -84,7 +112,19 @@ export function Session({
     setResults(all)
     setIndex(index + 1)
     setAnswer('')
+    setSelectedWords([])
     setChecked(false)
+  }
+
+  const toggleWordChip = (word: string) => {
+    if (checked) return
+    // Simple chip select / toggle logic
+    setSelectedWords((prev) => {
+      if (prev.includes(word)) {
+        return prev.filter((_, i) => i !== prev.indexOf(word))
+      }
+      return [...prev, word]
+    })
   }
 
   const choiceClass = (option: string) => {
@@ -121,7 +161,18 @@ export function Session({
               <>
                 {!isCorrect && (
                   <p>
-                    Réponse : <strong className={item.kind === 'write' || item.kind === 'listen' ? 'ar' : ''}>{expected}</strong>
+                    Réponse :{' '}
+                    <strong
+                      className={
+                        item.kind === 'write' ||
+                        item.kind === 'listen' ||
+                        item.kind === 'phrase-reorder'
+                          ? 'ar'
+                          : ''
+                      }
+                    >
+                      {expected}
+                    </strong>
                   </p>
                 )}
                 {item.note && <p>{item.note}</p>}
@@ -132,7 +183,15 @@ export function Session({
           />
         ) : (
           <div className="screen__actions">
-            <Button block disabled={answer === ''} onClick={() => setChecked(true)}>
+            <Button
+              block
+              disabled={
+                item.kind === 'phrase-reorder'
+                  ? selectedWords.length === 0
+                  : answer === ''
+              }
+              onClick={() => setChecked(true)}
+            >
               Vérifier
             </Button>
           </div>
@@ -144,11 +203,21 @@ export function Session({
         {(item.kind === 'recognize' || item.kind === 'teach') && (
           <p className="prompt__ar ar">{item.arabic}</p>
         )}
-        {(item.kind === 'translate' || item.kind === 'word-intro') && (
+        {(item.kind === 'translate' || item.kind === 'word-intro' || item.kind === 'phrase-intro') && (
           <p className="prompt__ar prompt__ar--word ar">{item.arabic}</p>
         )}
+        {item.kind === 'phrase-reorder' && <p className="title">{item.meaning}</p>}
         {item.kind === 'write' && <p className="title">{item.prompt}</p>}
       </div>
+
+      {item.kind === 'phrase-intro' && (
+        <div className="teach">
+          <p className="teach__name">{item.meaning}</p>
+          <p className="subtitle">{item.translit}</p>
+          <SpeakButton onPlay={play} playing={playing} />
+          {item.note && <p className="notice notice--calm">{item.note}</p>}
+        </div>
+      )}
 
       {item.kind === 'word-intro' && (
         <div className="teach">
@@ -185,14 +254,46 @@ export function Session({
           <SpeakButton onPlay={play} playing={playing} />
           {!hasArabicVoice() && (
             <p className="notice">
-              Aucune voix arabe installée sur cet appareil : l’exercice reste jouable, mais sans
-              son.
+              Aucune voix arabe installée sur cet appareil : l’exercice reste jouable.
             </p>
           )}
         </div>
       )}
 
-      {isIntro ? null : item.kind === 'write' ? (
+      {item.kind === 'phrase-reorder' && (
+        <div className="phrase-reorder-area">
+          <div className="phrase-built-slot ar">
+            {selectedWords.length > 0 ? (
+              selectedWords.map((word, i) => (
+                <span key={`${word}-${i}`} className="word-chip word-chip--selected">
+                  {word}
+                </span>
+              ))
+            ) : (
+              <span className="phrase-slot-placeholder">Touche les mots ci-dessous</span>
+            )}
+          </div>
+
+          <div className="word-chips-pool ar">
+            {item.arabicWords.map((word, i) => {
+              const isSelected = selectedWords.includes(word)
+              return (
+                <button
+                  key={`${word}-${i}`}
+                  type="button"
+                  disabled={checked || isSelected}
+                  className={`word-chip${isSelected ? ' word-chip--disabled' : ''}`}
+                  onClick={() => toggleWordChip(word)}
+                >
+                  {word}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {isIntro || item.kind === 'phrase-reorder' ? null : item.kind === 'write' ? (
         <input
           className="input ar"
           value={answer}

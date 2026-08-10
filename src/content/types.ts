@@ -28,6 +28,14 @@ export type WordIntroItem = Base & {
   meaning: string
 }
 
+/** Présentation d'une courte phrase de 2-3 mots. */
+export type PhraseIntroItem = Base & {
+  kind: 'phrase-intro'
+  arabic: string
+  translit: string
+  meaning: string
+}
+
 /** Voir un signe arabe, choisir sa lecture en latin. */
 export type RecognizeItem = Base & {
   kind: 'recognize'
@@ -36,13 +44,20 @@ export type RecognizeItem = Base & {
   options: string[]
 }
 
-/** Voir un mot arabe, choisir son sens en français. Modalité la plus accessible :
- *  elle ne demande que de reconnaître, pas de produire. */
+/** Voir un mot ou une phrase en arabe, choisir son sens en français. */
 export type TranslateItem = Base & {
   kind: 'translate'
   arabic: string
   answer: string
   options: string[]
+}
+
+/** Remettre les mots arabes mélangés dans le bon ordre pour former la phrase. */
+export type PhraseReorderItem = Base & {
+  kind: 'phrase-reorder'
+  meaning: string
+  arabicWords: string[]
+  expectedOrder: string[]
 }
 
 /** Entendre, choisir la graphie correspondante. Sert aux lettres comme aux mots. */
@@ -52,8 +67,7 @@ export type ListenItem = Base & {
   options: string[]
 }
 
-/** Lire une translittération, écrire l'arabe. Modalité la plus exigeante :
- *  il faut produire les signes, pas les reconnaître. */
+/** Lire une translittération, écrire l'arabe. Modalité la plus exigeante. */
 export type WriteItem = Base & {
   kind: 'write'
   prompt: string
@@ -63,13 +77,15 @@ export type WriteItem = Base & {
 export type Item =
   | TeachItem
   | WordIntroItem
+  | PhraseIntroItem
   | RecognizeItem
   | TranslateItem
+  | PhraseReorderItem
   | ListenItem
   | WriteItem
 
 /** Un écran de présentation ne se corrige pas : il n'entre ni dans le score ni dans la
  *  répétition espacée. */
 export function isScored(item: Item) {
-  return item.kind !== 'teach' && item.kind !== 'word-intro'
+  return item.kind !== 'teach' && item.kind !== 'word-intro' && item.kind !== 'phrase-intro'
 }

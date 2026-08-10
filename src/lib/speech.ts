@@ -1,7 +1,7 @@
 /** Audio arabe. L'app joue d'abord un fichier local stable quand il existe, puis utilise la
    synthese vocale du navigateur comme secours pour garder les exercices utilisables. */
 
-export type AudioKind = 'letter' | 'word'
+export type AudioKind = 'letter' | 'word' | 'phrase'
 
 export type AudioSourceInfo = {
   source: 'local' | 'fallback'

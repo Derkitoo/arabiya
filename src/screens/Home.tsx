@@ -2,7 +2,7 @@ import { Button, ProgressBar, Screen } from '../ui'
 import { streakOf, todayKey, type Profile } from '../lib/storage'
 import './screens.css'
 
-/** Un seul appel à l'action. Les chiffres informent, ils ne proposent rien à cliquer. */
+/** Un seul appel à l'action principal. Les raccourcis secondaires ouvrent les outils d'apprentissage. */
 export function Home({
   profile,
   screens,
@@ -14,6 +14,8 @@ export function Home({
   onStart,
   onOpenSettings,
   onOpenSounds,
+  onOpenPhonetics,
+  onOpenTrace,
 }: {
   profile: Profile
   screens: number
@@ -25,6 +27,8 @@ export function Home({
   onStart: () => void
   onOpenSettings: () => void
   onOpenSounds: () => void
+  onOpenPhonetics: () => void
+  onOpenTrace: () => void
 }) {
   const doneToday = profile.activeDays.includes(todayKey())
   const streak = streakOf(profile.activeDays)
@@ -50,9 +54,17 @@ export function Home({
       }
       actions={
         <div className="screen__actions">
-          <Button block variant="secondary" onClick={onOpenSounds}>
-            Sons : lettres et mots
-          </Button>
+          <div className="home-secondary-tools">
+            <Button variant="secondary" onClick={onOpenSounds}>
+              🔊 Sons
+            </Button>
+            <Button variant="secondary" onClick={onOpenPhonetics}>
+              🗣️ Phonétique
+            </Button>
+            <Button variant="secondary" onClick={onOpenTrace}>
+              ✍️ Tracé
+            </Button>
+          </div>
           <Button block onClick={onStart}>
             {doneToday ? 'Continuer quand même' : 'Commencer la session'}
           </Button>

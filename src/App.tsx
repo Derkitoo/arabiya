@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Home } from './screens/Home'
 import { Onboarding } from './screens/Onboarding'
+import { Phonetics } from './screens/Phonetics'
 import { Placement } from './screens/Placement'
 import { Session, type SessionResult } from './screens/Session'
 import { Settings } from './screens/Settings'
 import { Sounds } from './screens/Sounds'
 import { Summary } from './screens/Summary'
+import { TraceStudio } from './screens/TraceStudio'
 import { buildSession, describeSession, dueToday } from './content/session'
 import { letters, lettersById, type LetterFamily } from './content/letters'
 import { seedFromPlacement } from './content/placement'
@@ -18,6 +20,8 @@ type Route =
   | { name: 'session' }
   | { name: 'settings' }
   | { name: 'sounds' }
+  | { name: 'phonetics' }
+  | { name: 'trace' }
   | { name: 'placement' }
   | { name: 'summary'; correct: number; total: number }
 
@@ -30,7 +34,6 @@ export default function App() {
     saveProfile(profile)
   }, [profile])
 
-  // Recalculée quand les cartes changent, donc jamais pendant qu'on joue la session.
   const session = useMemo(
     () => buildSession(profile.goalMinutes ?? 10, profile.cards, today),
     [profile.goalMinutes, profile.cards, today],
@@ -40,8 +43,6 @@ export default function App() {
     (id) => profile.cards[id] && isMastered(profile.cards[id]),
   ).length
 
-  /** Le test de placement sert à l'inscription comme depuis les réglages : il ne touche
-   *  qu'aux cartes, jamais à la série ni au compteur de sessions. */
   const applyPlacement = (families: LetterFamily[]) => {
     setProfile((current) => ({
       ...current,
@@ -106,6 +107,8 @@ export default function App() {
           onStart={() => setRoute({ name: 'session' })}
           onOpenSettings={() => setRoute({ name: 'settings' })}
           onOpenSounds={() => setRoute({ name: 'sounds' })}
+          onOpenPhonetics={() => setRoute({ name: 'phonetics' })}
+          onOpenTrace={() => setRoute({ name: 'trace' })}
         />
       )}
       {route.name === 'session' && (
@@ -126,6 +129,8 @@ export default function App() {
         />
       )}
       {route.name === 'sounds' && <Sounds onBack={() => setRoute({ name: 'home' })} />}
+      {route.name === 'phonetics' && <Phonetics onBack={() => setRoute({ name: 'home' })} />}
+      {route.name === 'trace' && <TraceStudio onBack={() => setRoute({ name: 'home' })} />}
       {route.name === 'placement' && (
         <Placement onDone={applyPlacement} onSkip={() => setRoute({ name: 'home' })} />
       )}
