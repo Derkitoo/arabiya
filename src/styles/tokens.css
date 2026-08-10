@@ -87,23 +87,59 @@
   --app-max: 30rem;
 }
 
+/* Mode sombre Émeraude & Or Luxueux */
+html[data-theme="dark"] {
+  --bg: #0c1613;
+  --bg-surface: #142520;
+  --bg-sunken: #0b1310;
+  --text: #f0f7f4;
+  --text-muted: #8caea3;
+  --border: rgba(212, 175, 55, 0.22);
+  --border-strong: rgba(212, 175, 55, 0.45);
+  --accent: #36d399;
+  --accent-hover: #52e0aa;
+  --accent-soft: rgba(54, 211, 153, 0.15);
+  --gold-600: #d4af37;
+  --gold-400: #f3e5ab;
+  --gold-100: rgba(212, 175, 55, 0.15);
+  --ok-100: rgba(21, 128, 61, 0.25);
+  --bad-100: rgba(194, 53, 43, 0.25);
+  --shadow-1: 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-2: 0 6px 20px rgba(0, 0, 0, 0.6);
+  --shadow-3: 0 -8px 24px rgba(0, 0, 0, 0.7);
+}
+
+html[data-theme="light"] {
+  --bg: var(--paper);
+  --bg-surface: var(--surface);
+  --bg-sunken: var(--brand-050);
+  --text: var(--ink-900);
+  --text-muted: var(--ink-500);
+  --border: var(--ink-100);
+  --accent: var(--brand-700);
+  --accent-soft: var(--brand-100);
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #12100c;
-    --bg-surface: #1c1915;
-    --bg-sunken: #16221e;
-    --text: #f5f1e9;
-    --text-muted: #a8a094;
-    --border: #2e2a24;
-    --border-strong: #4a443b;
-    --accent: var(--brand-500);
-    --accent-hover: #46a98f;
-    --accent-soft: #1a3b33;
-    --ok-100: #14301f;
-    --bad-100: #3a1d1a;
-    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-2: 0 4px 16px rgba(0, 0, 0, 0.45);
-    --shadow-3: 0 -8px 24px rgba(0, 0, 0, 0.5);
+  html:not([data-theme="light"]) {
+    --bg: #0c1613;
+    --bg-surface: #142520;
+    --bg-sunken: #0b1310;
+    --text: #f0f7f4;
+    --text-muted: #8caea3;
+    --border: rgba(212, 175, 55, 0.22);
+    --border-strong: rgba(212, 175, 55, 0.45);
+    --accent: #36d399;
+    --accent-hover: #52e0aa;
+    --accent-soft: rgba(54, 211, 153, 0.15);
+    --gold-600: #d4af37;
+    --gold-400: #f3e5ab;
+    --gold-100: rgba(212, 175, 55, 0.15);
+    --ok-100: rgba(21, 128, 61, 0.25);
+    --bad-100: rgba(194, 53, 43, 0.25);
+    --shadow-1: 0 2px 4px rgba(0, 0, 0, 0.5);
+    --shadow-2: 0 6px 20px rgba(0, 0, 0, 0.6);
+    --shadow-3: 0 -8px 24px rgba(0, 0, 0, 0.7);
   }
 }
 

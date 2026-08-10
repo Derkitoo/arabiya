@@ -2,7 +2,6 @@ import { Button, ProgressBar, Screen } from '../ui'
 import { streakOf, todayKey, type Profile } from '../lib/storage'
 import './screens.css'
 
-/** Un seul appel à l'action principal. Les raccourcis secondaires ouvrent les outils d'apprentissage. */
 export function Home({
   profile,
   screens,
@@ -16,6 +15,8 @@ export function Home({
   onOpenSounds,
   onOpenPhonetics,
   onOpenTrace,
+  onOpenHandsFree,
+  onToggleTheme,
 }: {
   profile: Profile
   screens: number
@@ -29,9 +30,12 @@ export function Home({
   onOpenSounds: () => void
   onOpenPhonetics: () => void
   onOpenTrace: () => void
+  onOpenHandsFree: () => void
+  onToggleTheme: () => void
 }) {
   const doneToday = profile.activeDays.includes(todayKey())
   const streak = streakOf(profile.activeDays)
+  const isDark = profile.theme === 'dark'
 
   const parts = [
     reviews > 0 && `${reviews} à revoir`,
@@ -47,6 +51,9 @@ export function Home({
           </span>
           <strong>Arabiya</strong>
           <span className="top-spacer" />
+          <Button variant="ghost" onClick={onToggleTheme} aria-label="Changer de thème">
+            {isDark ? '☀️' : '🌙'}
+          </Button>
           <Button variant="ghost" onClick={onOpenSettings} aria-label="Réglages">
             <GearIcon />
           </Button>
@@ -63,6 +70,9 @@ export function Home({
             </Button>
             <Button variant="secondary" onClick={onOpenTrace}>
               ✍️ Tracé
+            </Button>
+            <Button variant="secondary" onClick={onOpenHandsFree}>
+              🎧 Mains libres
             </Button>
           </div>
           <Button block onClick={onStart}>

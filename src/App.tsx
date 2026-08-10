@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { HandsFree } from './screens/HandsFree'
 import { Home } from './screens/Home'
 import { Onboarding } from './screens/Onboarding'
 import { Phonetics } from './screens/Phonetics'
@@ -22,6 +23,7 @@ type Route =
   | { name: 'sounds' }
   | { name: 'phonetics' }
   | { name: 'trace' }
+  | { name: 'handsfree' }
   | { name: 'placement' }
   | { name: 'summary'; correct: number; total: number }
 
@@ -33,6 +35,16 @@ export default function App() {
   useEffect(() => {
     saveProfile(profile)
   }, [profile])
+
+  // Application du thème dynamique (Système, Clair, Sombre Émeraude)
+  useEffect(() => {
+    const theme = profile.theme ?? 'system'
+    if (theme === 'system') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+  }, [profile.theme])
 
   const session = useMemo(
     () => buildSession(profile.goalMinutes ?? 10, profile.cards, today),
@@ -50,6 +62,13 @@ export default function App() {
       cards: { ...seedFromPlacement(families, today), ...current.cards },
     }))
     setRoute({ name: 'home' })
+  }
+
+  const toggleTheme = () => {
+    setProfile((prev) => ({
+      ...prev,
+      theme: prev.theme === 'dark' ? 'light' : 'dark',
+    }))
   }
 
   if (profile.goalMinutes === null) {
@@ -109,6 +128,8 @@ export default function App() {
           onOpenSounds={() => setRoute({ name: 'sounds' })}
           onOpenPhonetics={() => setRoute({ name: 'phonetics' })}
           onOpenTrace={() => setRoute({ name: 'trace' })}
+          onOpenHandsFree={() => setRoute({ name: 'handsfree' })}
+          onToggleTheme={toggleTheme}
         />
       )}
       {route.name === 'session' && (
@@ -117,9 +138,11 @@ export default function App() {
       {route.name === 'settings' && (
         <Settings
           goalMinutes={profile.goalMinutes}
+          theme={profile.theme ?? 'system'}
           mastered={mastered}
           lettersTotal={letters.length}
           onChangeGoal={(goalMinutes) => setProfile({ ...profile, goalMinutes })}
+          onChangeTheme={(theme) => setProfile({ ...profile, theme })}
           onRetakePlacement={() => setRoute({ name: 'placement' })}
           onReset={() => {
             setProfile(emptyProfile)
@@ -131,6 +154,7 @@ export default function App() {
       {route.name === 'sounds' && <Sounds onBack={() => setRoute({ name: 'home' })} />}
       {route.name === 'phonetics' && <Phonetics onBack={() => setRoute({ name: 'home' })} />}
       {route.name === 'trace' && <TraceStudio onBack={() => setRoute({ name: 'home' })} />}
+      {route.name === 'handsfree' && <HandsFree onBack={() => setRoute({ name: 'home' })} />}
       {route.name === 'placement' && (
         <Placement onDone={applyPlacement} onSkip={() => setRoute({ name: 'home' })} />
       )}

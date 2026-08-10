@@ -170,7 +170,7 @@
 
 .home-secondary-tools {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--sp-2);
   width: 100%;
 }
@@ -281,7 +281,7 @@
 
 .tabs {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr));
   padding: 0.25rem;
   background: var(--bg-sunken);
   border: 1px solid var(--border);
@@ -508,7 +508,7 @@
   color: var(--text-muted);
 }
 
-/* Drawing Canvas & Atelier tactile (Adapté Mobile) */
+/* Drawing Canvas & Atelier tactile */
 .canvas-wrapper {
   display: grid;
   gap: var(--sp-3);
@@ -548,7 +548,6 @@
   cursor: not-allowed;
 }
 
-/* Navigation ‹ lettre › de l'Atelier d'écriture */
 .trace-nav-header {
   display: flex;
   align-items: center;
@@ -614,7 +613,6 @@
   text-align: center;
 }
 
-/* Grille 4×7 mobile ultra-optimisée pour les 28 lettres */
 .trace-grid-picker {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -654,7 +652,6 @@
   border-radius: var(--r-md);
 }
 
-/* Formes attachées en grille 4 colonnes mobile */
 .trace-forms-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -694,6 +691,167 @@
   font-size: 0.7rem;
   font-weight: 600;
   font-family: var(--font-ui);
+}
+
+/* Hands-Free Audio Player Screen */
+.handsfree-card {
+  display: grid;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-2);
+  text-align: center;
+}
+
+.handsfree-card__counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--t-xs);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.handsfree-eye-toggle {
+  border: none;
+  background: var(--bg-sunken);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--r-full);
+  color: var(--text);
+  font-size: var(--t-xs);
+  cursor: pointer;
+}
+
+/* Onde sonore / Égaliseur animé */
+.handsfree-wave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  height: 2.5rem;
+}
+
+.handsfree-wave span {
+  display: block;
+  width: 0.35rem;
+  height: 0.75rem;
+  background: var(--text-muted);
+  border-radius: var(--r-full);
+  transition: height var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.handsfree-wave--playing span {
+  background: var(--accent);
+  animation: waveBar 1.2s infinite ease-in-out alternate;
+}
+
+.handsfree-wave--playing span:nth-child(1) { animation-delay: 0.1s; }
+.handsfree-wave--playing span:nth-child(2) { animation-delay: 0.3s; }
+.handsfree-wave--playing span:nth-child(3) { animation-delay: 0.5s; }
+.handsfree-wave--playing span:nth-child(4) { animation-delay: 0.2s; }
+.handsfree-wave--playing span:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes waveBar {
+  0% { height: 0.5rem; }
+  100% { height: 2.25rem; }
+}
+
+.handsfree-card__display {
+  display: grid;
+  gap: var(--sp-2);
+  min-height: 8rem;
+  place-content: center;
+}
+
+.handsfree-card__arabic {
+  font-size: var(--ar-lg);
+  line-height: 1.3;
+  color: var(--accent);
+}
+
+.handsfree-card__title {
+  font-size: var(--t-xl);
+  font-weight: 700;
+}
+
+.handsfree-card__hidden {
+  font-size: var(--t-sm);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.handsfree-player-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+}
+
+.handsfree-btn {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  background: var(--bg-sunken);
+  color: var(--text);
+  border-radius: var(--r-full);
+  cursor: pointer;
+  transition: transform var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.handsfree-btn--nav {
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 1.25rem;
+}
+
+.handsfree-btn--play {
+  width: 4.5rem;
+  height: 4.5rem;
+  font-size: 1.75rem;
+  background: var(--accent);
+  color: var(--bg-surface);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-2);
+}
+
+.handsfree-settings-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px dashed var(--border);
+  text-align: left;
+}
+
+.handsfree-setting {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.handsfree-pills {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.handsfree-pill {
+  flex: 1;
+  padding: 0.35rem 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.handsfree-pill--active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
 }
 
 /* Exercices de réordonnancement de phrases */

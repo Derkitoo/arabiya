@@ -8,24 +8,33 @@ const GOALS = [
   { minutes: 20, title: 'Sérieux', meta: '20 min par jour' },
 ]
 
+const THEMES = [
+  { id: 'system', title: 'Automatique', meta: 'Suit le système' },
+  { id: 'light', title: 'Clair Papier', meta: 'Fond clair chaud' },
+  { id: 'dark', title: 'Sombre Émeraude', meta: 'Vert profond & or' },
+] as const
+
 export function Settings({
   goalMinutes,
+  theme = 'system',
   mastered,
   lettersTotal,
   onChangeGoal,
+  onChangeTheme,
   onRetakePlacement,
   onReset,
   onBack,
 }: {
   goalMinutes: number
+  theme?: 'system' | 'light' | 'dark'
   mastered: number
   lettersTotal: number
   onChangeGoal: (minutes: number) => void
+  onChangeTheme: (theme: 'system' | 'light' | 'dark') => void
   onRetakePlacement: () => void
   onReset: () => void
   onBack: () => void
 }) {
-  // La remise à zéro efface une progression que rien ne sauvegarde ailleurs : deux gestes.
   const [confirmReset, setConfirmReset] = useState(false)
 
   return (
@@ -46,6 +55,25 @@ export function Settings({
         </div>
       }
     >
+      <section className="settings-block">
+        <h2 className="stat__label">Apparence & Thème</h2>
+        <div className="options" role="radiogroup" aria-label="Thème d'affichage">
+          {THEMES.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              role="radio"
+              aria-checked={theme === option.id}
+              className={`option${theme === option.id ? ' option--selected' : ''}`}
+              onClick={() => onChangeTheme(option.id)}
+            >
+              <span className="option__title">{option.title}</span>
+              <span className="option__meta">{option.meta}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
       <section className="settings-block">
         <h2 className="stat__label">Objectif quotidien</h2>
         <div className="options" role="radiogroup" aria-label="Objectif quotidien">
@@ -79,8 +107,7 @@ export function Settings({
       <section className="settings-block">
         <h2 className="stat__label">Données</h2>
         <p className="subtitle">
-          Tout est enregistré dans ce navigateur uniquement. Rien n’est envoyé nulle part, et
-          rien n’est récupérable après effacement.
+          Tout est enregistré dans ce navigateur uniquement. Rien n’est envoyé nulle part.
         </p>
         {confirmReset ? (
           <div className="settings-danger">

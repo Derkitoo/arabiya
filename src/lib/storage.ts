@@ -20,6 +20,8 @@ export type Profile = {
   sessionsDone: number
   /** état de répétition espacée, indexé par id d'exercice */
   cards: Record<string, Card>
+  /** thème d'affichage : système, clair ou sombre luxueux */
+  theme?: 'system' | 'light' | 'dark'
 }
 
 /** Forme du schéma 1, conservée uniquement pour la migration. */
